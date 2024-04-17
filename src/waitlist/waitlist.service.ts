@@ -88,14 +88,18 @@ export class WaitlistService {
     await this.productWaitlist.save(user)
   }
 
-async getUserEmailWaitlist(email:string): Promise<any>{
-  const user= await this.productWaitlist.findOne({ where: {email}})
+  async getUserByEmail(email: string): Promise<void> {
+    const user = await this.productWaitlist.findOne({ email });
 
-  if(!user){
-    throw new NotFoundException("user not found among waitlist!")
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Create a new object without the user id
+    const { id, ...userWithoutId } = user;
+
+    return userWithoutId;
   }
-  return user
-}
 
   /**
    * @function exitWaitList  - stop receiving news letter
