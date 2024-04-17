@@ -37,14 +37,13 @@ export class WaitlistService {
       });
 
       if (record) {
-        return new HttpException(
+        return new BadRequestException(
           'The email provided already exist on the wait list',
-          HttpStatus.CONFLICT,
         );
       }
 
       // create a new record if not exist
-      const newWaitlistRecord = this.productWaitlist.create();
+      const newWaitlistRecord = this.productWaitlist.create({email, fullname});
       newWaitlistRecord.id = uuidv4();
       newWaitlistRecord.fullname = fullname;
       newWaitlistRecord.email = email.trim();
@@ -59,7 +58,7 @@ export class WaitlistService {
       //     fullname: newWaitlistRecord.fullname,
       //   },
       // };
-      await this.emailQueue.add(emailQueueData);
+      // await this.emailQueue.add(emailQueueData);
 
       // build up the response
       const response: ApiResponseInterface = {
@@ -75,6 +74,28 @@ export class WaitlistService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+
+  async updateUserEmail(id: string, newEmail: string): Promise<void>{
+    const user= await this.productWaitlist.findOne({
+      where: {id}
+    })
+
+    if(!user){
+      throw new NotFoundException('user not found!')
+    }
+    user.email= newEmail
+    await this.productWaitlist.save(user)
+  }
+
+async getUserEmailWaitlist(email:string): Promise<any>{
+  const user= await this.productWaitlist.findOne({ where: {email}})
+
+  if(!user){
+    throw new NotFoundException("user not found among waitlist!")
+  }
+  return user
+}
 
   /**
    * @function exitWaitList  - stop receiving news letter
