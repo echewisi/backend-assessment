@@ -88,7 +88,7 @@ export class WaitlistService {
     await this.productWaitlist.save(user)
   }
 
-  async getUserByEmail(email: string): Promise<void> {
+  async getUserEmailWaitlist(email: string): Promise<void> {
     const user = await this.productWaitlist.findOne({ email });
 
     if (!user) {
